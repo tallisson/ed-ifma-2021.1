@@ -1,145 +1,112 @@
 #include <iostream>
 #include <string>
 
-#define TAMANHO_AGENDA 10
-
 using namespace std;
 
-typedef struct contato {
+// Variáveis globais
+const int TAM = 10;
+string * nomes = new string[TAM];
+int size = 0;
+
+// Funções
+bool cheio(void) {;
+  return size == TAM;
+}
+
+void adicionar (void)
+{
+  if(cheio()) {
+    cout << "Vetor Cheio!" << endl;
+    return;
+  }
+  
+  cout << "Digite um nome: " << endl;
   string nome;
-  string whats;
-  string email;
-  string endereco;
-  string dataNasc;
+  cin >> nome;
+  nomes[size++] = nome;
+}
+
+string toString(void)
+{
+  if (size == 0) {
+    return "{}";
+  }
+  string s = "{" + nomes[0];
+  for (int i = 1; i < size; i++) {
+    s += ", " + nomes[i];
+  }
+  s += "}";
+
+  return s;
+}
+
+bool vazio(void) {
+  return size == 0;
+}
   
-  contato() {
-  }
-  
-  ~contato() {
-  }
-
-  string toString () {
-    return ("[" + nome + ", " + whats + "]");
-  }
-};
-
-typedef struct agenda {
-  contato * contatos = new contato[TAMANHO_AGENDA];
-  int qtdContatos;
-
-  agenda () 
-  {
-    qtdContatos = 0;
-  }
-  
-  void clear() {
-    cout << "Limpando a agenda" << endl;
-    delete[] contatos;
-    qtdContatos = 0;
-    contatos = new contato[TAMANHO_AGENDA];
-  }
-
-  ~agenda ()
-  {
-    delete[] contatos;
-    contatos = 0;
-  }
-
-  void add (contato c)
-  {
-    contatos[qtdContatos++] = c;
-  }
-
-  string toString ()
-  {
-    if (qtdContatos == 0)
-      {
-	return "{}";
-      }
-    string s = "{" + contatos[0].toString ();
-    for (int i = 1; i < qtdContatos; i++)
-      {
-	s += ", " + contatos[i].toString ();
-      }
-    s += "}";
-
-    return s;
-  }
-  
-  int find(string nome) {
-    for(int i = 0; i < qtdContatos; i++) {
-        if(contatos[i].nome == nome) {
-            return i;
-        }
+int buscar(string nomeProcurado) {
+  for(int i = 0; i < size; i++) {
+    if(nomes[i] == nomeProcurado) {
+      return i;
     }
-    
-    return -1;
   }
   
-  contato search(string nome) {
-      int index = find(nome);
-      if(index != -1) {
-          return contatos[index];
-      }
-      
-      return contato();
-  }
+  return -1;
+}
   
-  void rem(string nome) {
-      int index = find(nome);
-      for(int i = index; i < qtdContatos; i++) {
-          contatos[i] = contatos[i + 1];
-      }
-      qtdContatos--;
+void remover(string nomeProcurado) {
+  if(vazio()) {
+    cout << "Vetor vazio!" << endl;
+    return;
   }
+
+  int index = buscar(nomeProcurado);
+  for(int i = index; i < size; i++) {
+      nomes[i] = nomes[i + 1];
+  }
+
+  size--;
+}
   
-  void alterar(string nome, contato c) {
-      int index = find(nome);
-      if(index != -1) {
-        contatos[index] = c;
-        return;
-      }
-      
-      cout << "Contato ñ encontrado!" << endl;
+void removerInicio(void) {
+  if(vazio()) {
+    cout << "Vetor vazio!" << endl;
+    return;
   }
-};
+
+  for(int i = 0; i < size - 1; i++) {
+    nomes[i] = nomes[i + 1];
+  }
+
+  nomes[size - 1] = "";
+  size--;
+}
+
+void removerFim(void) {
+  if(vazio()) {
+    cout << "Vetor vazio!" << endl;
+    return;
+  }
+
+  nomes[size - 1] = "";
+  size--;
+}
 
 int main () {
-  agenda a;
-
-  contato c, c1;
-  c.nome = "João";
-  c.whats = "(99)98107-7744";
-  c.dataNasc = "11/09/1991";
-  
-  c1.nome = "Pedro";
-  c1.whats = "(99)98140-5463";
-
-  a.add (c);
-  a.add (c1);
-  
-  cout << "Agenda" << endl;
-  cout << a.toString () << endl;
-
-  contato cSearch = a.search("Léo");
-  if(cSearch.nome.size() > 0) {
-    cout << cSearch.toString() << endl;    
-  } else {
-    cout << "Contato ñ encontrado!" << endl;
+  for(int i = 0; i < 3; i++) {
+    adicionar();
   }
-  
-  a.rem("João");
-  cout << "Após remover João" << endl;
-  cout << a.toString() << endl;
-  
-  contato novoc;
-  novoc.nome = "Livia";
-  novoc.whats = "(99)98107-7745";
-  a.alterar("Pedro", novoc);
-  cout << a.toString() << endl;
+  cout << toString() << endl;
 
-  a.clear();
-  cout << a.toString () << endl;
+  cout << "Remover Fim: " << endl;
+  removerFim();
+  cout << toString() << endl;
   
+  cout << "Remover Inicio: " << endl;
+  removerInicio();
+  cout << toString() << endl;
+  
+  cout << buscar("Emanuelle") << endl;
+
   return 0;
 }
