@@ -4,191 +4,174 @@
 
 using namespace std;
 
+// Struct Nó
 typedef struct No {
+  // Propriedades do No
   No * proximo;
-  int valor;
-  
+  string valor;
+
+  /* 
+   * Construtor: são executados qnd criamos um nó
+   * e um construtor reserva um pedaço de memória
+   * p/ o Nó e inicializa as propriedades do Nó
+   */
   No() {
     proximo = NULL;
-    valor = 0;
   }
-  
-  No(int v) {
+  No(string v) {
     proximo = NULL;
     valor = v;
   }
-  
+
+  /*
+   * Destrutor do Nó: executado qnd um Nó for removido
+   * da memória e limpa (desaloca) a referência proximo
+   */
   virtual ~No() {
     delete proximo;
     proximo = NULL;
   }
+
+  void print() {
+    cout << "{ prox: " << proximo << ", valor: " << valor << "}\n";
+  }
 } No;
 
-typedef struct Lista {
-  No * cabeca;
-  No * cauda;
-  int qtdNos;
-  
-  Lista() {
+// Struct ListaSimples
+typedef struct ListaSimples {
+  // Propriedades
+  No * cabeca; // 1º nó da lista
+  No * cauda; // último nó da lista
+  int qtdNos; // Contabiliza a qtd de nós na lista
+
+  // Construtor
+  ListaSimples() {
     cabeca = NULL;
     cauda = NULL;
-    
     qtdNos = 0;
   }
-  
-  virtual ~Lista() {
+
+  ~ListaSimples() {
     delete cabeca;
+    cabeca = NULL;
   }
-  
-  void adicionar(int v) {
-    No * novoNo = new No(v);
-    if(qtdNos > 0)  {
-      cauda->proximo = novoNo;
-      cauda = novoNo;
-    } else {
-      cabeca = novoNo;
-      cauda = novoNo;  
-    }
-    
-    qtdNos++;
+
+  // Funções Auxiliares
+  int qtd() {
+    return qtdNos;
   }
-  
-  void adicionarComeco(int v) {
-    No * novoNo = new No(v);
-    
-    if(qtdNos == 0)  {
-      cabeca = novoNo;
-      cauda = novoNo;
-    } else {
-      novoNo->proximo = cabeca;
-      cabeca = novoNo;
-    }
-    
-    qtdNos++;
-  }
-  
-  void removerComeco() {
-    if(qtdNos == 0) {
-      return;
+
+  bool vazio() {
+    if(qtd() == 0) {
+      return true; // Lista Vazia
     }
 
-    if(qtdNos == 1) {
-      cabeca = NULL;
-      cauda = NULL;
-    } else {
-      cabeca = cabeca->proximo;
+    return false; // Lista não vazia
+  }
+
+  string toString() {
+    if(vazio() == true) {
+      return "[]";
     }
 
-    qtdNos--;
-  }
-  
-  void removerUltimo() {
-    if(qtdNos == 0) {
-      return;
-    }
-    
-    if(qtdNos == 1) {
-      removerComeco();
-      return;
-    }
+    stringstream ss;
+    ss << "[" << cabeca->valor;
     
     No * aux;
-    for(aux = cabeca; aux->proximo != cauda; aux = aux->proximo) { }
-    cauda = aux; 
-    cauda->proximo = NULL;
-    
-    qtdNos--;
-  }
-  
-  void remover(int v) {
-    if(qtdNos == 0) {
-      return;
-    }
-    
-    if(cabeca->valor == v) {
-      removerComeco();
-      return;
-    }
-    
-    if(cauda->valor == v) {
-      removerUltimo();
-      return;
-    }
-    
-    No * aux = cabeca->proximo;
-    No * ant = cabeca;
-    for(; aux != NULL; aux = aux->proximo) { 
-      if(aux->valor == v) {
-        break;
-      }
-    }
-    ant->proximo = aux->proximo; 
-    
-    qtdNos--;
-  }
-  
-  bool existe(int v) {
-    for(No * aux = cabeca; aux != NULL; aux = aux->proximo) {
-      if(aux->valor == v) {
-        return true;
-      }
-    }  
-    
-    return false;
-  }
-  
-  string toString() {
-    if(qtdNos == 0) {
-      return "{ }";
-    }
-    
-    stringstream ss;
-    ss << "{" << cabeca->valor;
-    for(No * aux = cabeca->proximo; aux != NULL; aux = aux->proximo) {
+    for(aux = cabeca->proximo; aux != NULL; aux = aux->proximo) {
       ss << ", " << aux->valor;
     }
-    ss << "}";
-    
+    ss << "]";
+
     return ss.str();
   }
-} Lista;
 
-int main()
-{
-  Lista l;
-  
-  l.adicionar(1);
-  l.adicionar(2);
-  l.adicionar(4);
-  cout << l.toString() << endl;
-  
-  l.removerComeco();
-  cout << l.toString() << endl;
-  
-  l.adicionar(5);
-  l.adicionar(6);
-  l.adicionar(7);
-  cout << l.toString() << endl;
-  
-  l.removerUltimo();
-  l.removerUltimo();
-  cout << l.toString() << endl;
-  
-  cout << "Removendo 5" << endl;
-  l.remover(5);
-  cout << l.toString() << endl;
-  
-  l.adicionar(6);
-  l.adicionar(7);
-  cout << l.toString() << endl;
-  
-  if(l.existe(7) == true) {
-    cout << "Nó encontrado" << endl;
+  // Funções Principais
+  // Adiciona na cabeça da lista
+  void adicionarInicio(string v) {
+    No * novoNo = new No(v);
+    novoNo->proximo = cabeca;
+    cabeca = novoNo;
+
+    if(vazio() == true) {
+      cauda = novoNo;
+    }
+
+    qtdNos++; // qtdNos = qtdNos + 1
   }
-  
-  l.adicionarComeco(1);
-  cout << l.toString() << endl;
-  
+
+  // Adiciona na cauda da lista
+  void adicionarFinal(string v) {
+    No * novoNo = new No(v);
+
+    if(vazio() == true) {           
+      cabeca = novoNo;
+      cauda = novoNo;
+    } else {
+      cauda->proximo = novoNo;
+      cauda = novoNo;
+    }
+
+    qtdNos++;
+  }
+
+  // Remove a cabeça da lista
+  string removerComeco() {
+    if(vazio() == true) {
+      cout << "Lista Vazia!" << endl;
+      return "";
+    }
+    
+    string temp = cabeca->valor;
+    cabeca = cabeca->proximo;
+
+    qtdNos--; // qtdNos = qtdNos - 1
+    return temp;
+  }
+
+  // Remove a cauda da lista
+  string removerFinal() {
+    if(vazio() == true) {
+      cout << "Lista Vazia!" << endl;
+      return ""; // String vazia
+    }
+
+    string temp = cauda->valor;
+    if(qtd() == 1) {      
+      cauda = NULL;
+      cabeca = NULL;
+    } else {
+      No * ant;
+      for(ant = cabeca; ant->proximo != cauda; ant = ant->proximo); 
+      cauda = ant;
+      cauda->proximo = NULL;
+    }
+
+    qtdNos--;
+    return temp;
+  }
+} ListaSimples;
+
+int main(int argc, char ** argv) {
+  // Testar a adição no inicio da Lista
+  ListaSimples * ls = new ListaSimples();
+  ls->adicionarFinal("Mariana");
+  cout << ls->toString() << endl;
+
+  ls->adicionarFinal("Perivaldo");
+  cout << ls->toString() << endl;
+
+  ls->adicionarFinal("Leane");  
+  cout << ls->toString() << endl;
+
+  ls->adicionarFinal("Fernandes");
+  cout << ls->toString() << endl;
+
+  for(int i = 0; i < 5; i++) {
+    cout << "Removendo " << ls->removerFinal() << endl;
+    cout << ls->toString() << endl;
+  }
+
+  delete ls;
   return 0;
 }
-
