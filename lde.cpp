@@ -1,21 +1,17 @@
 #include <iostream>
+#include <exception>
 #include <string>
 #include <sstream>
 
 using namespace std;
 
-typedef struct No {
+template <typename T>
+struct No {
   No * proximo;
   No * anterior;
-  int valor;
-  
-  No() {
-    anterior = NULL;  
-    proximo = NULL;
-    valor = 0;
-  }
-  
-  No(int v) {
+  T valor;
+
+  No(T v) {
     anterior = NULL;
     proximo = NULL;
     valor = v;
@@ -24,43 +20,34 @@ typedef struct No {
   virtual ~No() {
     delete proximo;
   }
-} No;
+};
 
-typedef struct Lista {
-  No * cabeca;
-  No * cauda;
+template <typename T>
+struct Deque {
+  No<T> * cabeca;
+  No<T> * cauda;
   int qtdNos;
   
-  Lista() {
+  Deque() {
     cabeca = NULL;
     cauda = NULL;
-    
     qtdNos = 0;
   }
   
-  virtual ~Lista() {
+  virtual ~Deque() {
     delete cabeca;
+    cabeca = NULL;
   }
   
-  void adicionar(int v) {
-    No * novoNo = new No(v);
-    
-    if(qtdNos > 0)  {
-      cauda->proximo = novoNo;
-      novoNo->anterior = cauda;
-      cauda = novoNo;
-    } else {
-      cabeca = novoNo;
-      cauda = novoNo;  
-    }
-    
-    qtdNos++;
+  // Informa se a lista está vazia
+  bool vazio() {
+    return qtdNos == 0;
   }
   
   void adicionarComeco(int v) {
-    No * novoNo = new No(v);
+    No<T> * novoNo = new No<T>(v);
     
-    if(qtdNos == 0)  {
+    if(vazio())  {
       cabeca = novoNo;
       cauda = novoNo;
     } else {
@@ -71,12 +58,28 @@ typedef struct Lista {
     
     qtdNos++;
   }
-  
-  void removerComeco() {
-    if(qtdNos == 0) {
-      return;
+
+  void adicionarFinal(int v) {
+    No<T> * novoNo = new No<T>(v);
+    
+    if(vazio())  {
+      cabeca = novoNo;
+      cauda = novoNo;
+    } else {
+      novoNo->anterior = cauda;
+      cauda->proximo = novoNo;
+      cauda = novoNo;
     }
     
+    qtdNos++;
+  }
+  
+  T removerComeco() {
+    if(vazio()) {
+      throw "Lista Vazia!";
+    }
+    
+    T temp = cabeca->valor;
     if(qtdNos == 1) {
       cabeca = NULL;
       cauda = NULL;
@@ -84,123 +87,95 @@ typedef struct Lista {
       cabeca = cabeca->proximo;
       cabeca->anterior = NULL;
     }
-    
+  
     qtdNos--;
+    return temp;  
   }
   
-  void removerUltimo() {
-    if(qtdNos == 0) {
-      return;
+  T removerFinal() {
+    if(vazio()) {
+      throw "Lista Vazia!";
     }
     
+    T temp = cauda->valor;
     if(qtdNos == 1) {
-      removerComeco();
-      return;
+      cabeca = NULL;
+      cauda = NULL;
+    } else {    
+      cauda = cauda->anterior; 
+      cauda->proximo = NULL;
     }
-    
-    cauda = cauda->anterior; 
-    cauda->proximo = NULL;
     
     qtdNos--;
+    return temp;
   }
   
-  void remover(int v) {
-    if(qtdNos == 0) {
-      return;
+  T remover(int v) {
+    if(vazio()) {
+      throw exception("Lista Vazia!");
     }
-    
+
     if(cabeca->valor == v) {
-      removerComeco();
-      return;
+      return removerComeco();
     }
     
     if(cauda->valor == v) {
-      removerUltimo();
-      return;
+      return removerFinal();
     }
     
-    No * aux = cabeca->proximo;
-    No * ant = cabeca;
-    for(; aux != NULL; aux = aux->proximo) { 
+    for(No<T> * aux = cabeca->proximo; aux != NULL; aux = aux->proximo) { 
       if(aux->valor == v) {
-        break;
+        aux->anterior->proximo = aux->proximo; 
+        aux->proximo->anterior = aux->anterior;
+        qtdNos--;
+        return aux->valor;
       }
     }
-    ant->proximo = aux->proximo; 
-    aux->proximo->anterior = ant;
-    
-    qtdNos--;
-  }
-  
-  bool existe(int v) {
-    for(No * aux = cabeca; aux != NULL; aux = aux->proximo) {
-      if(aux->valor == v) {
-        return true;
-      }
-    }  
-    
-    return false;
+    throw "Valor não encontrado!";
   }
   
   string toString() {
-    if(qtdNos == 0) {
-      return "{ }";
+    if(vazio()) {
+      return "[]";
     }
     
     stringstream ss;
-    ss << "{" << cabeca->valor;
-    for(No * aux = cabeca->proximo; aux != NULL; aux = aux->proximo) {
+    ss << "[" << cabeca->valor;
+    for(No<T> * aux = cabeca->proximo; aux != NULL; aux = aux->proximo) {
       ss << ", " << aux->valor;
     }
-    ss << "}";
+    ss << "]";
     
     return ss.str();
   }
-} Lista;
+};
 
 int main()
 {
-  Lista l;
+  Deque<int> * deque = new Deque<int>();
   
-  cout << "Adicionando 1, 2 e 4" << endl;
-  l.adicionar(1);
-  l.adicionar(2);
-  l.adicionar(4);
-  cout << l.toString() << endl;
+  cout << "Adicionando no Começo 1, 2 e 4" << endl;
+  deque->adicionarComeco(1);
+  deque->adicionarComeco(2);
+  deque->adicionarComeco(4);
+  cout << deque->toString() << endl;
   
-  cout << "Removendo 1" << endl;
-  l.removerComeco();
-  cout << l.toString() << endl;
+  cout << "Removendo do Começo: " << endl;
+  cout << deque->removerComeco() << endl;
+  cout << deque->toString() << endl;
   
-  cout << "Adicionando 5, 6 e 7" << endl;
-  l.adicionar(5);
-  l.adicionar(6);
-  l.adicionar(7);
-  cout << l.toString() << endl;
+  cout << "Adicionando no Final 5, 6 e 7" << endl;
+  deque->adicionarFinal(5);
+  deque->adicionarFinal(6);
+  deque->adicionarFinal(7);
+  cout << deque->toString() << endl;
   
-  cout << "Removendo 6 e 7" << endl;
-  l.removerUltimo();
-  l.removerUltimo();
-  cout << l.toString() << endl;
+  cout << "Removendo do Final: " << endl;
+  cout << deque->removerFinal() << endl;
+  cout << deque->removerFinal() << endl;
+  cout << deque->toString() << endl;
   
-  cout << "Removendo 5" << endl;
-  l.remover(5);
-  cout << l.toString() << endl;
-  
-  cout << "Adicionando 6 e 7" << endl;
-  l.adicionar(6);
-  l.adicionar(7);
-  cout << l.toString() << endl;
-  
-  cout << "Buscando nó com valor 7" << endl;
-  if(l.existe(7) == true) {
-    cout << "Nó encontrado" << endl;
-  }
-  
-  cout << "Adicionando 1" << endl;
-  l.adicionarComeco(1);
-  cout << l.toString() << endl;
-  
+  delete deque;
   return 0;
 }
 
