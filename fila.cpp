@@ -2,114 +2,108 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include "aspecto.h"
 
 using namespace std;
 
-typedef struct Node {
-  Node * next;
-  double value;
+template <typename T>
+struct No {
+  No<T> * proximo;
+  T valor;
   
-  Node() {
-    next = NULL;
-    value = 0;
+  No(T v) {
+    proximo = NULL;
+    valor = v;
   }
   
-  Node(double v) {
-    next = NULL;
-    value = v;
+  virtual ~No() {
+    delete proximo;
   }
-  
-  virtual ~Node() {
-    delete next;
-  }
-} Node;
+};
 
-typedef struct Queue {
-  Node * front;
-  Node * tail;
+template <typename T>
+struct Fila {
+  No<T> * frente;
+  No<T> * cauda;
   int qtd;
   
-  Queue() {
-    front = NULL;  
-    tail = NULL;
+  Fila() {
+    frente = NULL;  
+    cauda = NULL;
     qtd = 0;
   }
   
-  virtual ~Queue() {
-    delete front;
+  virtual ~Fila() {
+    delete frente;
   }
   
-  void enqueue(double v) {
-    Node * newNode = new Node(v);
+  void enfileirar(T v) {
+    No<T> * novoNo = new No<T>(v);
     
     if(qtd == 0) {
-      front = newNode;
-      tail = newNode;
+      frente = novoNo;
+      cauda = novoNo;
     } else {
-      tail->next = newNode;
-      tail = newNode;
+      cauda->proximo = novoNo;
+      cauda = novoNo;
     } 
     
     qtd++;
   }
   
-  double dequeue() {
+  T desenfileirar() {
     if(qtd == 0) {
       throw "Fila vazia!";
     }
     
-    double v = front->value;
+    T v = frente->valor;
     
-    front = front->next;
     if(qtd == 1) {
-      tail = NULL;
+      frente = NULL;
+      cauda = NULL;
+    } else {
+      frente = frente->proximo;
     }
     
     qtd--;
+    return v;
   }
   
   string toString() {
     if(qtd == 0) {
-      return "{}";
+      return "[]";
     }
     
     stringstream ss;
-    ss << "{" << front->value;
-    for(Node * aux = front->next; aux != NULL; aux = aux->next) {
-      ss << ", " << aux->value;
+    ss << "[" << frente->valor;
+    for(No<T> * aux = frente->proximo; aux != NULL; aux = aux->proximo) {
+      ss << ", " << aux->valor;
     }
-    ss << "}";
+    ss << "]";
     
     return ss.str();
   }
-} Queue;
+};
 
 int main () {
-  Queue q;
+  Fila<int> * q = new Fila<int>();
   
-  q.enqueue(10);
-  q.enqueue(20);
-  q.enqueue(30);
-  cout << q.toString() << endl;
+  q->enfileirar(10);
+  q->enfileirar(20);
+  q->enfileirar(30);
+  cout << q->toString() << endl;
   
-  cout << "Desenfileirando: " << q.dequeue() << endl;
-  cout << q.toString() << endl;
+  cout << "Desenfileirando: " << q->desenfileirar() << endl;
+  cout << q->toString() << endl;
   
-  cout << "Desenfileirando: " << q.dequeue() << endl;
-  cout << q.toString() << endl;
+  cout << "Desenfileirando: " << q->desenfileirar() << endl;
+  cout << q->toString() << endl;
   
-  cout << "Desenfileirando: " << q.dequeue() << endl;
-  cout << q.toString() << endl;
+  cout << "Desenfileirando: " << q->desenfileirar() << endl;
+  cout << q->toString() << endl;
   
-  try {
-    cout << "Desenfileirando: " << q.dequeue() << endl;
-  } catch(const char * msg) {
-    cout << msg << endl;
-  }
-  
-  q.enqueue(40);
-  q.enqueue(50);
-  cout << q.toString() << endl;
-  
+  cout << "Soma = " << soma(10.1, 1.0) << endl;
+
+  delete q;
   return 0;
 }
