@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include "aspecto.h"
 
 using namespace std;
 
@@ -101,8 +100,6 @@ int main () {
   
   cout << "Desenfileirando: " << q->desenfileirar() << endl;
   cout << q->toString() << endl;
-  
-  cout << "Soma = " << soma(10.1, 1.0) << endl;
 
   delete q;
   return 0;

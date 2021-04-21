@@ -5,110 +5,92 @@
 
 using namespace std;
 
-typedef struct Node {
-  Node * next;
-  double value;
+template <typename T>
+struct No {
+  No<T> * proximo;
+  T valor;
   
-  Node() {
-    next = NULL;
-    value = 0;
+  No(T v) {
+    proximo = NULL;
+    valor = v;
   }
   
-  Node(double v) {
-    next = NULL;
-    value = v;
+  virtual ~No() {
+    delete proximo;
   }
-  
-  virtual ~Node() {
-    delete next;
-  }
-} Node;
+};
 
-typedef struct Stack {
-  Node * top;
+template <typename T>
+struct Pilha {
+  No<T> * topo;
   int qtd;
   
-  Stack() {
-    top = NULL; 
+  Pilha() {
+    topo = NULL; 
     qtd = 0;
   }
   
-  virtual ~Stack() {
-    delete top;
+  virtual ~Pilha() {
+    delete topo;
   }
   
-  void push(double v) {
-    Node * newNode = new Node(v);
+  void empilhar(T v) {
+    No<T> * novoNo = new No<T>(v);
     
     if(qtd == 0) {
-      top = newNode;
+      topo = novoNo;
     } else {
-      newNode->next = top;
-      top = newNode;
+      novoNo->proximo = topo;
+      topo = novoNo;
     } 
     
     qtd++;
   }
   
-  double pop() {
+  T desempilhar() {
     if(qtd == 0) {
       throw "Pilha vazia!";
     }
     
-    double v = top->value;
-    
-    top = top->next;
-    if(qtd == 1) {
-      top = NULL;
-    }
-    
+    T temp = topo->valor;
+    topo = topo->proximo;  
     qtd--;
+
+    return temp;
   }
   
   string toString() {
     if(qtd == 0) {
-      return "{}";
+      return "[]";
     }
     
     stringstream ss;
-    ss << "{" << top->value;
-    for(Node * aux = top->next; aux != NULL; aux = aux->next) {
-      ss << ", " << aux->value;
+    ss << "[" << topo->valor;
+    for(No<T> * aux = topo->proximo; aux != NULL; aux = aux->proximo) {
+      ss << ", " << aux->valor;
     }
-    ss << "}";
+    ss << "]";
     
     return ss.str();
   }
-} Stack;
+};
 
 int main () {
-  Stack q;
+  Pilha<int> * p = new Pilha<int>();
   
   cout << "Push " << endl;
-  q.push(10);
-  q.push(20);
-  q.push(30);
-  cout << q.toString() << endl;
+  p->empilhar(10);
+  p->empilhar(20);
+  p->empilhar(30);
+  cout << p->toString() << endl;
   
-  cout << "Pop: " << q.pop() << endl;
-  cout << q.toString() << endl;
+  /*cout << "Pop: " << p->desempilhar() << endl;
+  cout << p->toString() << endl;
   
-  cout << "Pop: " << q.pop() << endl;
-  cout << q.toString() << endl;
+  cout << "Pop: " << p->desempilhar() << endl;
+  cout << p->toString() << endl;*/
   
-  cout << "Pop: " << q.pop() << endl;
-  cout << q.toString() << endl;
-  
-  try {
-    cout << "Pop: " << q.pop() << endl;
-  } catch(const char * msg) {
-    cout << msg << endl;
-  }
-  
-  cout << "Push " << endl;
-  q.push(40);
-  q.push(50);
-  cout << q.toString() << endl;
+  delete p;
   
   return 0;
 }
