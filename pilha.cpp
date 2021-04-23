@@ -33,11 +33,23 @@ struct Pilha {
   virtual ~Pilha() {
     delete topo;
   }
-  
+
+  int qtd() {
+    return qtd;
+  }
+
+  bool vazio() {
+    return qtd() == 0;
+  }
+
+  T topo() {
+    return topo->valor;
+  }
+
   void empilhar(T v) {
     No<T> * novoNo = new No<T>(v);
     
-    if(qtd == 0) {
+    if(vazio()) {
       topo = novoNo;
     } else {
       novoNo->proximo = topo;
@@ -48,7 +60,7 @@ struct Pilha {
   }
   
   T desempilhar() {
-    if(qtd == 0) {
+    if(vazio()) {
       throw "Pilha vazia!";
     }
     
@@ -60,7 +72,7 @@ struct Pilha {
   }
   
   string toString() {
-    if(qtd == 0) {
+    if(vazio()) {
       return "[]";
     }
     
@@ -84,11 +96,11 @@ int main () {
   p->empilhar(30);
   cout << p->toString() << endl;
   
-  /*cout << "Pop: " << p->desempilhar() << endl;
+  cout << "Pop: " << p->desempilhar() << endl;
   cout << p->toString() << endl;
   
   cout << "Pop: " << p->desempilhar() << endl;
-  cout << p->toString() << endl;*/
+  cout << p->toString() << endl;
   
   delete p;
   

@@ -35,11 +35,26 @@ struct Fila {
   virtual ~Fila() {
     delete frente;
   }
+
+  int qtd() {
+    return qtd;
+  }
+
+  bool vazio() {
+    return qtd == 0;
+  }
+
+  T frente() {
+    if(vazio()) {
+      throw "Fila vazia!";
+    }
+    return frente->valor;
+  }
   
   void enfileirar(T v) {
     No<T> * novoNo = new No<T>(v);
     
-    if(qtd == 0) {
+    if(vazio()) {
       frente = novoNo;
       cauda = novoNo;
     } else {
@@ -51,7 +66,7 @@ struct Fila {
   }
   
   T desenfileirar() {
-    if(qtd == 0) {
+    if(vazio()) {
       throw "Fila vazia!";
     }
     
@@ -69,7 +84,7 @@ struct Fila {
   }
   
   string toString() {
-    if(qtd == 0) {
+    if(vazio()) {
       return "[]";
     }
     
