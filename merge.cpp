@@ -60,10 +60,12 @@ string toString(int v[], int tam) {
 
 int main(int argc, char ** argv) {
   int v[] = {10, 2, 23, 21, 9, 4, 8, 1, 34};
-  int tam = 9;
+  int tam = (sizeof(v) / sizeof(v[0]));
+
   cout << toString(v, tam) << endl;
   
   mergeSort(v, 0, tam-1, tam);
   cout << toString(v, tam) << endl;
+  
   return 0;
 }
