@@ -124,6 +124,9 @@ typedef struct ListaSimples {
     
     string temp = cabeca->valor;
     cabeca = cabeca->proximo;
+    if(qtd() == 1) {
+      cauda = NULL;
+    }
 
     qtdNos--; // qtdNos = qtdNos - 1
     return temp;
