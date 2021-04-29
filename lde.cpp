@@ -81,11 +81,16 @@ struct Deque {
     
     T temp = cabeca->valor;
     if(qtdNos == 1) {
+      No<T> * aux = cabeca;
       cabeca = NULL;
       cauda = NULL;
+      delete aux;
     } else {
+      No<T> * aux = cabeca;
       cabeca = cabeca->proximo;
       cabeca->anterior = NULL;
+      aux->proximo = NULL;
+      delete aux;
     }
   
     qtdNos--;
@@ -99,11 +104,16 @@ struct Deque {
     
     T temp = cauda->valor;
     if(qtdNos == 1) {
+      No<T> * aux = cabeca;
       cabeca = NULL;
       cauda = NULL;
+      delete aux;
     } else {    
+      No<T> * aux = cauda;
       cauda = cauda->anterior; 
       cauda->proximo = NULL;
+      aux->anterior = NULL;
+      delete aux;
     }
     
     qtdNos--;
@@ -165,9 +175,9 @@ int main()
   cout << deque->toString() << endl;
   
   cout << "Adicionando no Final 5, 6 e 7" << endl;
-  deque->adicionarFinal(5);
-  deque->adicionarFinal(6);
-  deque->adicionarFinal(7);
+  //deque->adicionarFinal(5);
+  //deque->adicionarFinal(6);
+  //deque->adicionarFinal(7);
   cout << deque->toString() << endl;
   
   cout << "Removendo do Final: " << endl;

@@ -123,7 +123,10 @@ typedef struct ListaSimples {
     }
     
     string temp = cabeca->valor;
+    No * aux = cabeca;
     cabeca = cabeca->proximo;
+    aux->proximo = NULL;
+    delete aux;
     if(qtd() == 1) {
       cauda = NULL;
     }
@@ -146,8 +149,10 @@ typedef struct ListaSimples {
     } else {
       No * ant;
       for(ant = cabeca; ant->proximo != cauda; ant = ant->proximo); 
+      No * aux = cauda;
       cauda = ant;
       cauda->proximo = NULL;
+      delete aux;
     }
 
     qtdNos--;
@@ -171,7 +176,7 @@ int main(int argc, char ** argv) {
   cout << ls->toString() << endl;
 
   for(int i = 0; i < 5; i++) {
-    cout << "Removendo " << ls->removerFinal() << endl;
+    cout << "Removendo " << ls->removerComeco() << endl;
     cout << ls->toString() << endl;
   }
 
